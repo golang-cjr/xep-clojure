@@ -53,5 +53,6 @@
          [{:Data {:sender _ :body "пщ"} :ID _ :Type "message"}] {:Data {:body "(пщ)"}}
          [{:Data {:sender _ :body "test"} :ID _ :Type "message"}] {:Data {:body "||"}}
          [{:Data {:sender _ :body "ping"} :ID _ :Type "message"}] {:Data {:body "Clj bot alive!"}}
+         [{:Data {:sender sender :body "дёрг"} :ID _ :Type "message"}] {:Data {:body (format "/me дёрнул анус %s по его просьбе" sender)}}
          [{:Data {:sender sender :body body} :ID _ :Type "message"}] (try-eval sender body)
          :else (println (format "Missing handler for message %s" message))))
