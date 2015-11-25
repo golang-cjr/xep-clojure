@@ -18,7 +18,7 @@
     (edn/read-string body)
     (catch java.lang.RuntimeException e (println e))))
 
-(def allowed-functions #{'group-by 'partition 'merge 'count 'reduce '-> 'seq 'string? 'keyword 'clojure.walk/postwalk 'value 'if 'fn 'xep.bot/state 'agent 'send 'deref '+ '- '* '/ 'map 'inc 'dec 'even? 'filter 'list 'vector 'apply 'comp '= 'not= 'quote 'for 'format 'some 'keep 'restart-agent})
+(def allowed-functions #{'letfn 'let '_ 'contains? 'as-> 'sequence 'into 'transduce 'take 'odd? 'flatten 'x 'y 'z 'group-by 'partition 'merge 'count 'reduce '-> 'seq 'string? 'keyword 'clojure.walk/postwalk 'value 'if 'fn 'xep.bot/state 'agent 'send 'deref '+ '- '* '/ 'map 'inc 'dec 'even? 'filter 'list 'vector 'apply 'comp '= 'not= 'quote 'for 'format 'some 'keep 'restart-agent})
 
 (defn check-expr [expr]
   (let [denied-functions (transient [])]
@@ -49,10 +49,12 @@
 
 (defn handler [message]
   (match [message]
-         [{:Data _ :ID _ :Type "ping"}] {:Type "pong"}
-         [{:Data {:sender _ :body "пщ"} :ID _ :Type "message"}] {:Data {:body "(пщ)"}}
-         [{:Data {:sender _ :body "test"} :ID _ :Type "message"}] {:Data {:body "||"}}
-         [{:Data {:sender _ :body "ping"} :ID _ :Type "message"}] {:Data {:body "Clj bot alive!"}}
-         [{:Data {:sender sender :body "дёрг"} :ID _ :Type "message"}] {:Data {:body (format "/me дёрнул анус %s по его просьбе" sender)}}
-         [{:Data {:sender sender :body body} :ID _ :Type "message"}] (try-eval sender body)
+         [{:Type "ping"}] {:Type "pong"}
+         [{:Data {:body "пщ"} :Type "message"}] {:Data {:body "(пщ)"}}
+         [{:Data {:body "test"} :Type "message"}] {:Data {:body "||"}}
+         [{:Data {:body "ping"} :Type "message"}] {:Data {:body "Clj bot alive!"}}
+         [{:Data {:body "ня!"} :Type "message"}] {:Data {:body "ня!"}}
+         [{:Data {:sender sender :body "дёрг"} :Type "message"}] {:Data {:body (format "/me дёрнул анус %s по его просьбе" sender)}}
+         [{:Data {:sender sender :body body} :Type "message"}] (try-eval sender body)
+         [nil] nil
          :else (println (format "Missing handler for message %s" message))))
