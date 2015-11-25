@@ -17,15 +17,26 @@
                        {:Data {:sender "xep-osos"} :Type "message"}
                        message))))
 
-(defn receive []
+(def push-queue (async/chan 100))
+
+(defn go-message-sender! [client]
+  (async/go
+    (loop [message (async/<! push-queue)]
+      (push-message client message)
+      (recur (async/<! push-queue)))))
+
+(defn receive [client channel]
+  (loop [message (pull-message channel)]
+    (async/go
+      (println (format "Input message: %s" message))
+      (when-let [response-message (handler message)]
+        (println (format "Output message: %s" response-message))
+        (async/>! push-queue response-message)))
+    (recur (pull-message channel))))
+
+(defn -main [& args]
   (let [client @(tcp/client tcp-config)
         channel (async/chan 10)]
     (s/connect client channel)
-    (loop [message (pull-message channel)]
-      (when-let [response-message (handler message)]
-        (println response-message)
-        (push-message client response-message))
-      (recur (pull-message channel)))))
-
-(defn -main [& args]
-  (receive))
+    (go-message-sender! client)
+    (receive client channel)))
